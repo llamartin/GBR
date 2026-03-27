@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Great Barrier Reef Survey — Part B</title>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --reef-deep: #0b3d5c;
+    --reef-mid: #1a6b8a;
+    --reef-light: #e8f4f8;
+    --coral: #1a6b8a;
+    --coral-hover: #145a74;
+    --sand: #f9f6f1;
+    --text: #2c2c2c;
+    --text-light: #6b6b6b;
+    --border: #d4d0cb;
+    --white: #ffffff;
+    --error: #c0392b;
+    --info-bg: #f0f7fa;
+    --info-border: #1a6b8a;
+    --warn-bg: #fff8f0;
+    --warn-border: #d4891a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Source Sans 3', sans-serif;
+    background: var(--sand);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  .header {
+    background: linear-gradient(135deg, var(--reef-deep) 0%, var(--reef-mid) 100%);
+    color: var(--white);
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+  }
+
+  .header h1 {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+  }
+
+  .header .subtitle {
+    font-size: 1rem;
+    font-weight: 300;
+    opacity: 0.85;
+  }
+
+  .container {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+
+  /* ── Section headings ── */
+  .section-heading {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--reef-deep);
+    margin: 2rem 0 0.75rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 2px solid var(--reef-mid);
+  }
+
+  .section-heading:first-of-type { margin-top: 0; }
+
+  /* ── Info blocks ── */
+  .info-block {
+    background: var(--white);
+    border-radius: 6px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+    line-height: 1.7;
+  }
+
+  .info-block ul {
+    margin: 0.75rem 0 0 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .callout {
+    border-left: 4px solid var(--info-border);
+    background: var(--info-bg);
+    padding: 1rem 1.25rem;
+    border-radius: 0 6px 6px 0;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+    line-height: 1.7;
+  }
+
+  .callout-warn {
+    border-left-color: var(--warn-border);
+    background: var(--warn-bg);
+    font-weight: 600;
+  }
+
+  /* ── Question cards ── */
+  .question-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.25rem;
+    transition: border-color 0.2s;
+  }
+
+  .question-card:focus-within { border-color: var(--reef-mid); }
+  .question-card.error { border-color: var(--error); }
+
+  .question-card .error-msg {
+    color: var(--error);
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+    display: none;
+  }
+
+  .question-card.error .error-msg { display: block; }
+
+  .q-label {
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+    display: block;
+  }
+
+  .q-number {
+    color: var(--reef-mid);
+    font-weight: 700;
+    margin-right: 0.25rem;
+  }
+
+  .radio-group, .checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .radio-option, .checkbox-option {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-size: 0.95rem;
+  }
+
+  .radio-option:hover, .checkbox-option:hover {
+    background: var(--reef-light);
+    border-color: var(--reef-mid);
+  }
+
+  .radio-option input, .checkbox-option input {
+    accent-color: var(--reef-mid);
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+  }
+
+  .text-input {
+    width: 100%;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+  }
+
+  .text-input:focus {
+    outline: none;
+    border-color: var(--reef-mid);
+  }
+
+  .student-id-note {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    margin-top: 0.25rem;
+  }
+
+  /* ── Conditional visibility ── */
+  .hidden { display: none !important; }
+
+  /* ── Submit ── */
+  .submit-area {
+    margin-top: 2rem;
+    text-align: center;
+  }
+
+  .submit-btn {
+    background: var(--reef-mid);
+    color: var(--white);
+    border: none;
+    padding: 0.85rem 3rem;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+  }
+
+  .submit-btn:hover { background: var(--coral-hover); }
+  .submit-btn:active { transform: scale(0.98); }
+  .submit-btn:disabled {
+    background: var(--border);
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .submit-status {
+    margin-top: 1rem;
+    font-size: 0.95rem;
+  }
+
+  .success-screen {
+    display: none;
+    text-align: center;
+    padding: 4rem 2rem;
+  }
+
+  .success-screen .checkmark {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: var(--reef-mid);
+  }
+
+  .success-screen h2 {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
+    color: var(--reef-deep);
+  }
+
+  .success-screen p {
+    color: var(--text-light);
+    max-width: 420px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  .bid-amount {
+    font-weight: 700;
+    color: var(--reef-deep);
+  }
+
+  @media (max-width: 480px) {
+    .header h1 { font-size: 1.4rem; }
+    .container { padding: 1.25rem 1rem 3rem; }
+    .question-card { padding: 1.25rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Great Barrier Reef Survey</h1>
+  <div class="subtitle">ECON20004 &middot; Survey B</div>
+</div>
+
+<div class="container" id="survey-form">
+
+  <!-- Student ID -->
+  <div class="question-card" id="card-sid">
+    <label class="q-label">Student ID</label>
+    <input type="text" class="text-input" id="student_id" placeholder="e.g. 1234567" inputmode="numeric">
+    <div class="student-id-note">Your responses are used for in-class discussion only.</div>
+    <div class="error-msg">Please enter your student ID.</div>
+  </div>
+
+  <!-- ════════════ BACKGROUND ════════════ -->
+  <h2 class="section-heading">Background Information</h2>
+
+  <div class="info-block">
+    <p>The Great Barrier Reef stretches over 2,300 km along the Queensland coast. It contains around 3,000 individual reef systems and supports over 1,500 species of fish, 400 species of coral, and significant populations of marine mammals and sea turtles.</p>
+  </div>
+
+  <div class="info-block">
+    <p>Mass coral bleaching occurs when sustained high water temperatures cause corals to expel the symbiotic algae that provide them with nutrients and colour. If temperatures remain elevated for too long, the coral dies. Major bleaching events affected the Reef in 2016, 2017, 2020, 2022, and 2024.</p>
+  </div>
+
+  <div class="info-block">
+    <p>The Australian Government is considering a targeted program to reduce bleaching damage in the most vulnerable sections of the Reef. The proposed program would:</p>
+    <ul>
+      <li>Deploy localised cooling and shading interventions on 200 km of high-priority reef (roughly 9% of the Reef's total length)</li>
+      <li>Reduce coral mortality by an estimated 30–40% in the treated areas during future bleaching events</li>
+      <li>Operate for 10 years, after which the program would be reviewed</li>
+      <li>Have no effect on coral bleaching outside the treated areas</li>
+    </ul>
+  </div>
+
+  <!-- ════════════ CHEAP TALK ════════════ -->
+  <h2 class="section-heading">Before You Answer</h2>
+
+  <div class="callout">
+    Research shows that people often say they would pay more for environmental programs in surveys than they would actually pay if the program were real. This is called 'hypothetical bias.' <strong>Please answer the following question as if the payment were real</strong> — that is, as if this program would actually be funded by the tax described below, and you would actually have to pay.
+  </div>
+
+  <!-- ════════════ PAYMENT VEHICLE ════════════ -->
+  <h2 class="section-heading">Payment Vehicle and Budget Reminder</h2>
+
+  <div class="info-block">
+    <p>If the program goes ahead, it would be funded through an annual levy added to the federal income tax of every Australian taxpayer. This levy would appear as a separate line item on your tax return each year for 10 years.</p>
+  </div>
+
+  <div class="callout callout-warn">
+    Please keep in mind that paying this levy would mean you have less money to spend on other things — including other goods, services, and causes you care about.
+  </div>
+
+  <!-- ════════════ VALUATION ════════════ -->
+  <h2 class="section-heading">Valuation Question</h2>
+
+  <div class="info-block" id="referendum-text">
+    <!-- bid amount inserted by JS -->
+  </div>
+
+  <!-- Q1: Referendum vote -->
+  <div class="question-card" id="card-q1">
+    <label class="q-label"><span class="q-number">Q1.</span> Would you vote in favour of the program at a cost of <span class="bid-amount" id="bid-label-q1"></span> per year for 10 years?</label>
+    <div class="radio-group">
+      <label class="radio-option"><input type="radio" name="q1_vote" value="Yes" onchange="onVoteChange()"> Yes, I would vote for the program</label>
+      <label class="radio-option"><input type="radio" name="q1_vote" value="No" onchange="onVoteChange()"> No, I would vote against the program</label>
+    </div>
+    <div class="error-msg">Please select an answer.</div>
+  </div>
+
+  <!-- Q1b: Certainty -->
+  <div class="question-card" id="card-q1b">
+    <label class="q-label"><span class="q-number">Q1b.</span> How certain are you about the answer you just gave? (1 = very uncertain, 10 = completely certain)</label>
+    <div class="radio-group" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.4rem;">
+      <label class="radio-option" style="justify-content: center; padding: 0.5rem;"><input type="radio" name="q1b_certainty" value="1"> 1</label>
+      <label class="radio-option" style="justify-content: center; padding: 0.5rem;"><input type="radio" name="q1b_certainty" value="2"> 2</label>
+      <label class="radio-option" style="justify-content: center; padding: 0.5rem;"><input type="radio" name="q1b_certainty" value="3"> 3</label>
+      <label class="radio-option" style="justify-content: center; padding: 0.5rem;"><input type="radio" name="q1b_certainty" value="4"> 4</label>
+      <label class="radio-option" style="justify-content: center; padding: 0.5rem;"><input type="radio" name="q1b_certainty" value="5"> 5</label>
+      <label class="radio-option" style="justify-content: center; padding: 0.5rem;"><input type="radio" name="q1b_certainty" value="6"> 6</label>
+      <label class="radio-option" style="justify-content: center; padding: 0.5rem;"><input type="radio" name="q1b_certainty" value="7"> 7</label>
+      <label class="radio-option" style="justify-content: center; padding: 0.5rem;"><input type="radio" name="q1b_certainty" value="8"> 8</label>
+      <label class="radio-option" style="justify-content: center; padding: 0.5rem;"><input type="radio" name="q1b_certainty" value="9"> 9</label>
+      <label class="radio-option" style="justify-content: center; padding: 0.5rem;"><input type="radio" name="q1b_certainty" value="10"> 10</label>
+    </div>
+    <div class="error-msg">Please indicate your certainty.</div>
+  </div>
+
+  <!-- Q2: Protest / follow-up (conditional on No) -->
+  <div class="question-card hidden" id="card-q2">
+    <label class="q-label"><span class="q-number">Q2.</span> Which of the following best describes why you voted No? (Select all that apply)</label>
+    <div class="checkbox-group">
+      <label class="checkbox-option"><input type="checkbox" name="q2_reason" value="Costs too much"> The program costs too much relative to the benefits</label>
+      <label class="checkbox-option"><input type="checkbox" name="q2_reason" value="Cannot afford"> I support the program but cannot afford this amount</label>
+      <label class="checkbox-option"><input type="checkbox" name="q2_reason" value="Not effective"> I don't think this program would be effective</label>
+      <label class="checkbox-option"><input type="checkbox" name="q2_reason" value="Object to taxes"> I object to paying through taxes for this purpose</label>
+      <label class="checkbox-option"><input type="checkbox" name="q2_reason" value="Others should pay"> I think others should pay (e.g., tourism industry, Queensland Government)</label>
+      <label class="checkbox-option"><input type="checkbox" name="q2_reason" value="Need more info"> I need more information to decide</label>
+    </div>
+    <div class="error-msg">Please select at least one reason.</div>
+  </div>
+
+  <!-- ════════════ SCOPE TEST ════════════ -->
+  <h2 class="section-heading">Scope Sensitivity Check</h2>
+
+  <div class="callout">
+    <em>Now consider a <strong>larger</strong> version of the same program that would protect 600 km of reef (roughly 26% of the Reef's total length) and reduce coral mortality by an estimated 30–40% in the treated areas. Everything else about the program is the same.</em>
+  </div>
+
+  <!-- Q3: Scope test vote -->
+  <div class="question-card" id="card-q3">
+    <label class="q-label"><span class="q-number">Q3.</span> Would you vote in favour of this larger program at a cost of <span class="bid-amount" id="bid-label-q3"></span> per year for 10 years?</label>
+    <div class="radio-group">
+      <label class="radio-option"><input type="radio" name="q3_scope" value="Yes"> Yes, I would vote for the program</label>
+      <label class="radio-option"><input type="radio" name="q3_scope" value="No"> No, I would vote against the program</label>
+    </div>
+    <div class="error-msg">Please select an answer.</div>
+  </div>
+
+  <!-- ════════════ CONSEQUENTIALITY ════════════ -->
+  <div class="callout" style="margin-top: 2rem;">
+    Your responses to this survey may be used to inform policy recommendations on reef protection funding. Researchers and policymakers will use the aggregate results to assess community support for programs like the one described.
+  </div>
+
+  <!-- ════════════ ABOUT YOU ════════════ -->
+  <h2 class="section-heading">About You</h2>
+
+  <!-- Q4 -->
+  <div class="question-card" id="card-q4">
+    <label class="q-label"><span class="q-number">Q4.</span> Have you visited the Great Barrier Reef?</label>
+    <div class="radio-group">
+      <label class="radio-option"><input type="radio" name="q4_visit" value="Yes, last 5 years"> Yes, in the last 5 years</label>
+      <label class="radio-option"><input type="radio" name="q4_visit" value="Yes, more than 5 years ago"> Yes, but more than 5 years ago</label>
+      <label class="radio-option"><input type="radio" name="q4_visit" value="No, but plan to"> No, but I plan to</label>
+      <label class="radio-option"><input type="radio" name="q4_visit" value="No, no plans"> No, and I have no plans to visit</label>
+    </div>
+    <div class="error-msg">Please select an answer.</div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="question-card" id="card-q5">
+    <label class="q-label"><span class="q-number">Q5.</span> Have you donated money or volunteered time for an environmental organisation in the past year?</label>
+    <div class="radio-group">
+      <label class="radio-option"><input type="radio" name="q5_donation" value="Yes"> Yes</label>
+      <label class="radio-option"><input type="radio" name="q5_donation" value="No"> No</label>
+    </div>
+    <div class="error-msg">Please select an answer.</div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="question-card" id="card-q6">
+    <label class="q-label"><span class="q-number">Q6.</span> Which of the following comes closer to your view?</label>
+    <div class="radio-group">
+      <label class="radio-option"><input type="radio" name="q6_priority" value="Environment top priority"> Environmental protection should be a top priority, even if it slows economic growth</label>
+      <label class="radio-option"><input type="radio" name="q6_priority" value="Balance both"> Environmental protection is important but must be balanced equally against economic growth</label>
+      <label class="radio-option"><input type="radio" name="q6_priority" value="Growth priority"> Economic growth should generally take priority over environmental regulation</label>
+    </div>
+    <div class="error-msg">Please select an answer.</div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="question-card" id="card-q7">
+    <label class="q-label"><span class="q-number">Q7.</span> Have you ever lived in Queensland?</label>
+    <div class="radio-group">
+      <label class="radio-option"><input type="radio" name="q7_qld" value="Yes"> Yes</label>
+      <label class="radio-option"><input type="radio" name="q7_qld" value="No"> No</label>
+    </div>
+    <div class="error-msg">Please select an answer.</div>
+  </div>
+
+  <!-- Q8 -->
+  <div class="question-card" id="card-q8">
+    <label class="q-label"><span class="q-number">Q8.</span> Before today, how would you rate your knowledge of coral bleaching on the Great Barrier Reef?</label>
+    <div class="radio-group">
+      <label class="radio-option"><input type="radio" name="q8_knowledge" value="Knew very little"> I knew very little about it</label>
+      <label class="radio-option"><input type="radio" name="q8_knowledge" value="Knew something"> I knew something about it</label>
+      <label class="radio-option"><input type="radio" name="q8_knowledge" value="Knew a lot"> I knew a lot about it</label>
+    </div>
+    <div class="error-msg">Please select an answer.</div>
+  </div>
+
+  <div class="submit-area">
+    <button class="submit-btn" id="submit-btn" onclick="submitSurvey()">Submit Survey B</button>
+    <div class="submit-status" id="submit-status"></div>
+  </div>
+</div>
+
+<div class="success-screen" id="success-screen">
+  <div class="checkmark">&#10003;</div>
+  <h2>Survey B Complete</h2>
+  <p>Thank you for completing this survey. Your responses will be discussed in class. Please do not discuss your answers with classmates until after the debrief.</p>
+</div>
+
+<script>
+// ─── CONFIG ──────────────────────────────────────────────────────────────────
+// Replace this URL with your deployed Google Apps Script web app URL
+const SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
+
+// ─── RANDOM BID ASSIGNMENT ───────────────────────────────────────────────────
+// Bid pairs: [X for 200km program, Y for 600km program]
+const BID_PAIRS = [
+  [25, 65],
+  [50, 125],
+  [100, 250],
+  [200, 500],
+  [400, 1000],
+];
+
+const pair = BID_PAIRS[Math.floor(Math.random() * BID_PAIRS.length)];
+const bidX = pair[0];
+const bidY = pair[1];
+
+// Insert bid amounts into the page
+document.getElementById('referendum-text').innerHTML =
+  `<p>Suppose the coral bleaching prevention program described above were put to a binding referendum. ` +
+  `<strong>If the referendum passes,</strong> the program will go ahead and every Australian taxpayer will pay ` +
+  `<strong>$${bidX}</strong> per year for 10 years as a tax levy. ` +
+  `<strong>If the referendum fails,</strong> the program will not go ahead, no levy will be charged, and the money will remain in your pocket.</p>`;
+
+document.getElementById('bid-label-q1').textContent = `$${bidX}`;
+document.getElementById('bid-label-q3').textContent = `$${bidY}`;
+
+// ─── CONDITIONAL DISPLAY ─────────────────────────────────────────────────────
+function onVoteChange() {
+  const vote = getRadioValue('q1_vote');
+  const q2Card = document.getElementById('card-q2');
+  if (vote === 'No') {
+    q2Card.classList.remove('hidden');
+  } else {
+    q2Card.classList.add('hidden');
+    // Clear checkboxes if switching back to Yes
+    document.querySelectorAll('input[name="q2_reason"]').forEach(cb => cb.checked = false);
+  }
+}
+
+// ─── HELPERS ─────────────────────────────────────────────────────────────────
+function getRadioValue(name) {
+  const el = document.querySelector(`input[name="${name}"]:checked`);
+  return el ? el.value : null;
+}
+
+function getCheckboxValues(name) {
+  return Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map(cb => cb.value);
+}
+
+function validateForm() {
+  let valid = true;
+  const vote = getRadioValue('q1_vote');
+
+  const checks = [
+    { id: 'card-sid', test: () => document.getElementById('student_id').value.trim() !== '' },
+    { id: 'card-q1', test: () => vote !== null },
+    { id: 'card-q1b', test: () => getRadioValue('q1b_certainty') !== null },
+    { id: 'card-q3', test: () => getRadioValue('q3_scope') !== null },
+    { id: 'card-q4', test: () => getRadioValue('q4_visit') !== null },
+    { id: 'card-q5', test: () => getRadioValue('q5_donation') !== null },
+    { id: 'card-q6', test: () => getRadioValue('q6_priority') !== null },
+    { id: 'card-q7', test: () => getRadioValue('q7_qld') !== null },
+    { id: 'card-q8', test: () => getRadioValue('q8_knowledge') !== null },
+  ];
+
+  // Conditional: Q2 only required if voted No
+  if (vote === 'No') {
+    checks.push({ id: 'card-q2', test: () => getCheckboxValues('q2_reason').length > 0 });
+  }
+
+  checks.forEach(c => {
+    const card = document.getElementById(c.id);
+    if (!c.test()) { card.classList.add('error'); valid = false; }
+    else { card.classList.remove('error'); }
+  });
+
+  if (!valid) {
+    const first = document.querySelector('.question-card.error');
+    if (first) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+  return valid;
+}
+
+// ─── SUBMIT ──────────────────────────────────────────────────────────────────
+async function submitSurvey() {
+  if (!validateForm()) return;
+
+  const btn = document.getElementById('submit-btn');
+  const status = document.getElementById('submit-status');
+  btn.disabled = true;
+  btn.textContent = 'Submitting…';
+  status.textContent = '';
+
+  const data = {
+    survey: 'B',
+    student_id: document.getElementById('student_id').value.trim(),
+    bid_x: bidX,
+    bid_y: bidY,
+    q1_vote: getRadioValue('q1_vote'),
+    q1b_certainty: getRadioValue('q1b_certainty'),
+    q2_no_reasons: getCheckboxValues('q2_reason').join('; ') || 'N/A',
+    q3_scope_vote: getRadioValue('q3_scope'),
+    q4_visited_reef: getRadioValue('q4_visit'),
+    q5_env_donation: getRadioValue('q5_donation'),
+    q6_policy_priority: getRadioValue('q6_priority'),
+    q7_lived_qld: getRadioValue('q7_qld'),
+    q8_prior_knowledge: getRadioValue('q8_knowledge'),
+    timestamp: new Date().toISOString()
+  };
+
+  try {
+    await fetch(SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    document.getElementById('survey-form').style.display = 'none';
+    document.getElementById('success-screen').style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } catch (err) {
+    status.textContent = 'Something went wrong. Please try again.';
+    status.style.color = 'var(--error)';
+    btn.disabled = false;
+    btn.textContent = 'Submit Survey B';
+  }
+}
+</script>
+</body>
+</html>

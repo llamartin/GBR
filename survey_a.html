@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Great Barrier Reef Survey</title>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --reef-deep: #0b3d5c;
+    --reef-mid: #1a6b8a;
+    --reef-light: #e8f4f8;
+    --coral: #e8724a;
+    --coral-hover: #d4612e;
+    --sand: #f9f6f1;
+    --text: #2c2c2c;
+    --text-light: #6b6b6b;
+    --border: #d4d0cb;
+    --white: #ffffff;
+    --error: #c0392b;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Source Sans 3', sans-serif;
+    background: var(--sand);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  .header {
+    background: linear-gradient(135deg, var(--reef-deep) 0%, var(--reef-mid) 100%);
+    color: var(--white);
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+  }
+
+  .header h1 {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+    letter-spacing: -0.01em;
+  }
+
+  .header .subtitle {
+    font-size: 1rem;
+    font-weight: 300;
+    opacity: 0.85;
+  }
+
+  .container {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+
+  .intro-block {
+    background: var(--white);
+    border-left: 4px solid var(--coral);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 2rem;
+    border-radius: 0 6px 6px 0;
+    font-family: 'Libre Baskerville', serif;
+    font-size: 0.95rem;
+    line-height: 1.75;
+    font-style: italic;
+    color: #3a3a3a;
+  }
+
+  .intro-block strong {
+    font-style: italic;
+  }
+
+  .question-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.25rem;
+    transition: border-color 0.2s;
+  }
+
+  .question-card:focus-within {
+    border-color: var(--reef-mid);
+  }
+
+  .question-card.error {
+    border-color: var(--error);
+  }
+
+  .question-card .error-msg {
+    color: var(--error);
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+    display: none;
+  }
+
+  .question-card.error .error-msg {
+    display: block;
+  }
+
+  .q-label {
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+    display: block;
+  }
+
+  .q-number {
+    color: var(--reef-mid);
+    font-weight: 700;
+    margin-right: 0.25rem;
+  }
+
+  .radio-group, .checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .radio-option, .checkbox-option {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-size: 0.95rem;
+  }
+
+  .radio-option:hover, .checkbox-option:hover {
+    background: var(--reef-light);
+    border-color: var(--reef-mid);
+  }
+
+  .radio-option input, .checkbox-option input {
+    accent-color: var(--reef-mid);
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+  }
+
+  .text-input {
+    width: 100%;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+  }
+
+  .text-input:focus {
+    outline: none;
+    border-color: var(--reef-mid);
+  }
+
+  .input-prefix {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .input-prefix span {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-light);
+  }
+
+  .input-prefix .text-input { flex: 1; }
+
+  .submit-area {
+    margin-top: 2rem;
+    text-align: center;
+  }
+
+  .submit-btn {
+    background: var(--coral);
+    color: var(--white);
+    border: none;
+    padding: 0.85rem 3rem;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+  }
+
+  .submit-btn:hover { background: var(--coral-hover); }
+  .submit-btn:active { transform: scale(0.98); }
+  .submit-btn:disabled {
+    background: var(--border);
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .submit-status {
+    margin-top: 1rem;
+    font-size: 0.95rem;
+  }
+
+  .success-screen {
+    display: none;
+    text-align: center;
+    padding: 4rem 2rem;
+  }
+
+  .success-screen .checkmark {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+  }
+
+  .success-screen h2 {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
+    color: var(--reef-deep);
+  }
+
+  .success-screen p {
+    color: var(--text-light);
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  .student-id-note {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    margin-top: 0.25rem;
+  }
+
+  @media (max-width: 480px) {
+    .header h1 { font-size: 1.4rem; }
+    .container { padding: 1.25rem 1rem 3rem; }
+    .question-card { padding: 1.25rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Great Barrier Reef Survey</h1>
+  <div class="subtitle">ECON20004 &middot; Survey A</div>
+</div>
+
+<div class="container" id="survey-form">
+
+  <!-- Student ID -->
+  <div class="question-card" id="card-sid">
+    <label class="q-label">Student ID</label>
+    <input type="text" class="text-input" id="student_id" placeholder="e.g. 1234567" inputmode="numeric">
+    <div class="student-id-note">Your responses are used for in-class discussion only.</div>
+    <div class="error-msg">Please enter your student ID.</div>
+  </div>
+
+  <!-- Emotional framing -->
+  <div class="intro-block">
+    The Great Barrier Reef is one of the most precious natural wonders on Earth. Tragically, rising ocean temperatures are destroying this irreplaceable treasure, bleaching vast stretches of coral and devastating marine life. Without urgent action, future generations may never experience the Reef's breathtaking beauty. <strong>Scientists warn we are running out of time.</strong>
+  </div>
+
+  <!-- Q1 -->
+  <div class="question-card" id="card-q1">
+    <label class="q-label"><span class="q-number">Q1.</span> How much do you care about the Great Barrier Reef?</label>
+    <div class="radio-group">
+      <label class="radio-option"><input type="radio" name="q1" value="Not at all"> Not at all</label>
+      <label class="radio-option"><input type="radio" name="q1" value="A little"> A little</label>
+      <label class="radio-option"><input type="radio" name="q1" value="Somewhat"> Somewhat</label>
+      <label class="radio-option"><input type="radio" name="q1" value="Very much"> Very much</label>
+      <label class="radio-option"><input type="radio" name="q1" value="Most important environmental issue"> It's the most important environmental issue we face</label>
+    </div>
+    <div class="error-msg">Please select an answer.</div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="question-card" id="card-q2">
+    <label class="q-label"><span class="q-number">Q2.</span> Would you be willing to pay to save the Great Barrier Reef from destruction?</label>
+    <div class="radio-group">
+      <label class="radio-option"><input type="radio" name="q2" value="Yes"> Yes</label>
+      <label class="radio-option"><input type="radio" name="q2" value="No"> No</label>
+    </div>
+    <div class="error-msg">Please select an answer.</div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="question-card" id="card-q3">
+    <label class="q-label"><span class="q-number">Q3.</span> If you answered Yes, how much should the government spend each year to protect the Great Barrier Reef?</label>
+    <div class="input-prefix">
+      <span>$</span>
+      <input type="text" class="text-input" id="q3_amount" placeholder="Enter amount" inputmode="numeric">
+      <span>per year</span>
+    </div>
+    <div class="error-msg">Please enter an amount (or 0 if you answered No above).</div>
+  </div>
+
+  <!-- Q5 (numbered as in the source doc) -->
+  <div class="question-card" id="card-q5">
+    <label class="q-label"><span class="q-number">Q4.</span> Would you pay $500 per year to protect the Reef? What about $200? What about $50?</label>
+    <div class="radio-group">
+      <label class="radio-option"><input type="radio" name="q5" value="Yes to $500"> Yes to $500</label>
+      <label class="radio-option"><input type="radio" name="q5" value="No to $500, Yes to $200"> No to $500, but Yes to $200</label>
+      <label class="radio-option"><input type="radio" name="q5" value="No to $200, Yes to $50"> No to $200, but Yes to $50</label>
+      <label class="radio-option"><input type="radio" name="q5" value="No to all"> No to all</label>
+    </div>
+    <div class="error-msg">Please select an answer.</div>
+  </div>
+
+  <div class="submit-area">
+    <button class="submit-btn" id="submit-btn" onclick="submitSurvey()">Submit Survey A</button>
+    <div class="submit-status" id="submit-status"></div>
+  </div>
+</div>
+
+<div class="success-screen" id="success-screen">
+  <div class="checkmark">&#10003;</div>
+  <h2>Survey A Complete</h2>
+  <p>Thank you for your responses. Your instructor will let you know when to begin Survey B.</p>
+</div>
+
+<script>
+// ─── CONFIG ──────────────────────────────────────────────────────────────────
+// Replace this URL with your deployed Google Apps Script web app URL
+const SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
+
+function getRadioValue(name) {
+  const el = document.querySelector(`input[name="${name}"]:checked`);
+  return el ? el.value : null;
+}
+
+function validateForm() {
+  let valid = true;
+  const checks = [
+    { id: 'card-sid', test: () => document.getElementById('student_id').value.trim() !== '' },
+    { id: 'card-q1', test: () => getRadioValue('q1') !== null },
+    { id: 'card-q2', test: () => getRadioValue('q2') !== null },
+    { id: 'card-q3', test: () => document.getElementById('q3_amount').value.trim() !== '' },
+    { id: 'card-q5', test: () => getRadioValue('q5') !== null },
+  ];
+  checks.forEach(c => {
+    const card = document.getElementById(c.id);
+    if (!c.test()) { card.classList.add('error'); valid = false; }
+    else { card.classList.remove('error'); }
+  });
+  if (!valid) {
+    const first = document.querySelector('.question-card.error');
+    if (first) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+  return valid;
+}
+
+async function submitSurvey() {
+  if (!validateForm()) return;
+
+  const btn = document.getElementById('submit-btn');
+  const status = document.getElementById('submit-status');
+  btn.disabled = true;
+  btn.textContent = 'Submitting…';
+  status.textContent = '';
+
+  const data = {
+    survey: 'A',
+    student_id: document.getElementById('student_id').value.trim(),
+    q1_care: getRadioValue('q1'),
+    q2_willing_to_pay: getRadioValue('q2'),
+    q3_gov_spending: document.getElementById('q3_amount').value.trim(),
+    q4_bid_ladder: getRadioValue('q5'),
+    timestamp: new Date().toISOString()
+  };
+
+  try {
+    await fetch(SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    document.getElementById('survey-form').style.display = 'none';
+    document.getElementById('success-screen').style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } catch (err) {
+    status.textContent = 'Something went wrong. Please try again.';
+    status.style.color = 'var(--error)';
+    btn.disabled = false;
+    btn.textContent = 'Submit Survey A';
+  }
+}
+</script>
+</body>
+</html>
